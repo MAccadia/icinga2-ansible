@@ -10,6 +10,20 @@
   with_items:
     - php7.0
     - libapache2-mod-php7.0
+    - php-gd
+
+
+- name: Find out timezone
+  slurp:
+     src: /etc/timezone
+  register: etc_timezone
+
+- name: Timezone in php.ini
+  lineinfile:
+    path: /etc/php/7.0/apache2/php.ini
+    regexp: '^;?date.timezone ='
+    line: 'date.timezone = "{{ etc_timezone["content"] | b64decode | regex_replace("\n") }}"'
+  notify: restart apache2
 
 - name: Find out timezone
   slurp:
@@ -133,16 +147,3 @@
   with_items:
     - monitoring
     - translation
-
-- name: Get setup token.
-  shell: 'icingacli setup token create | sed "s/.*token is: \(.*\)/\1/g"'
-  register: setup_token
-  tags: token
-
-
-- name: Icinga Web2 Installation finished (RH)
-  debug:
-    msg="The WebUI token is {{ setup_token.stdout }}, us it at http://IP//icingaweb2/setup to continue the installation"
-  tags:
-    - icinga2-ansible-web2-ui-install
-    - token
