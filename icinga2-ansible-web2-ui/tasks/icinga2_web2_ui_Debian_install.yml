@@ -5,13 +5,25 @@
 
 - name: Install PHP requirements
   apt:
-    name: "{{ item}}"
+    name: "{{ item }}"
     state: present
   with_items:
-    - php7.0
-    - libapache2-mod-php7.0
+    - php
     - php-gd
+    - libapache2-mod-php
   notify: restart apache2
+
+- name: Get PHP version
+  command: php --version
+  register: php_version
+  changed_when: false
+
+- name: Set PHP version
+  set_fact: php_version="{{ php_version.stdout_lines[0] | regex_replace('^PHP (\d\.\d).*$','\\1') }}"
+
+- name: Enable PHP apache module
+  apache2_module: name="php{{ php_version }}"
+
 
 - name: Find out timezone
   slurp:
@@ -20,7 +32,7 @@
 
 - name: Timezone in php.ini
   lineinfile:
-    path: /etc/php/7.0/apache2/php.ini
+    path: '/etc/php/{{ php_version }}/apache2/php.ini'
     regexp: '^;?date.timezone ='
     line: 'date.timezone = "{{ etc_timezone["content"] | b64decode | regex_replace("\n") }}"'
   notify: restart apache2
@@ -41,7 +53,7 @@
     name: "{{ icinga2_db_user }}"
     password: "{{ icinga2_db_pass }}"
     state: present
-    priv: "{{ icinga2_db }}.*:GRANT,INSERT,SELECT,UPDATE,DELETE,DROP,CREATE VIEW,INDEX,EXECUTE"
+    priv: "{{ icinga2_db }}.*:ALL"
 
 - name: Import the IDO Schema on Icinga Web Database (only once)
   mysql_db:
