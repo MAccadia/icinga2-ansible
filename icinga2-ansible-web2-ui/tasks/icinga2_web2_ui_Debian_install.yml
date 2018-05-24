@@ -17,6 +17,7 @@
   command: php --version
   register: php_version
   changed_when: false
+  check_mode: no # run command even in check_mode
 
 - name: Set PHP version
   set_fact: php_version="{{ php_version.stdout_lines[0] | regex_replace('^PHP (\d\.\d).*$','\\1') }}"
