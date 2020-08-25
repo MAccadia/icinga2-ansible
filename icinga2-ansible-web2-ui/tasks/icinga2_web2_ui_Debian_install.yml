@@ -10,7 +10,6 @@
   loop:
     - php
     - php-gd
-<<<<<<< HEAD
     - libapache2-mod-php
   notify: restart apache2
 
@@ -23,10 +22,7 @@
 - name: Set PHP version
   set_fact:
     php_version: "{{ php_version.stdout_lines[0] | regex_replace('^PHP (\\d\\.\\d).*$','\\1') }}"
-=======
   notify: restart apache2
-    
->>>>>>> master
 
 - name: Enable PHP apache module
   apache2_module:
