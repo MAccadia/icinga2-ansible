@@ -4,9 +4,9 @@
     src: icinga2.conf.j2
     dest: "{{ icinga2_main_conf }}"
     backup: yes
-    owner: root
-    group: root
-    mode: 0644
+    owner: nagios
+    group: nagios
+    mode: 0640
   when: icinga2_conf_global | default('') | length
   notify:
    - restart icinga2
