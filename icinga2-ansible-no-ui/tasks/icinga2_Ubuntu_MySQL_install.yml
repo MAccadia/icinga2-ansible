@@ -36,8 +36,3 @@
     name: icinga2
     state: started
     enabled: yes
-
-- name: Fix logrotate misconfig # see https://github.com/Icinga/icinga2/issues/4240
-  template:
-    src: icinga2_logrotate_ubuntu.j2
-    dest: /etc/logrotate.d/icinga2
